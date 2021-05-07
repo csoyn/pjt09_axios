@@ -1,0 +1,72 @@
+<div class="jumbotron text-center text-white bg-dark">
+  <p class="lead mb-1">작성자 정보</p>
+  <h1 class="display-4">{{ person.username }}</h1>
+  <hr>
+  {% with followings=person.followings.all followers=person.followers.all %}
+    <p class="friends">
+      팔로잉 : {{ followings|length }}명
+      팔로워 : {{ followers|length }}명
+    </p>
+    <!-- 팔로우 버튼 -->
+    {% if request.user != person %}
+      <form id="follow-form" data-user-id="{{ person.pk }}">
+        {% csrf_token %}
+        {% if request.user in followers %}
+          <button class="btn btn-link">
+            <i class="follow-{{ person.pk }} fas fa-users-slash">Unfollow</i>
+          </button>
+        {% else %}
+          <button class="btn btn-link">
+            <i class="follow-{{ person.pk }} fas fa-user-friends">Follow</i>
+          </button>
+        {% endif %}
+      </form>
+    {% endif %}
+  {% endwith %}
+</div>
+
+ <!-- axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <!-- FontAwesome -->
+  <script src="https://kit.fontawesome.com/fb909e362b.js" crossorigin="anonymous"></script>
+  <!-- script -->
+  <script>
+    const form = document.querySelector('#follow-form')
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value
+    form.addEventListener('submit', function (event) {
+      event.preventDefault()
+      const userId = event.target.dataset.userId
+      console.log(userId)
+
+      axios({
+        method: 'post',
+        baseURL: 'http://127.0.0.1:8000/accounts/',
+        url: `follow/${userId}/`,
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
+      })
+        .then(response => {
+          const followed = response.data.followed
+          const followButton = document.querySelector(`.follow-${userId}`)
+          if (followed) {
+            followButton.classList.toggle('fa-user-friends')
+            followButton.classList.toggle('fa-users-slash')
+            followButton.innerText = 'Unfollow'
+          }
+          else {
+            followButton.classList.toggle('fa-users-slash')
+            followButton.classList.toggle('fa-user-friends')
+            followButton.innerText = 'Follow'
+          }
+          console.log(response.data.followers_count)
+          console.log(response.data.followings_count)
+          const followersCount = response.data.followers_count
+          const followingsCount = response.data.followings_count
+          const friendsP = document.querySelector('.friends')
+          friendsP.innerText = `팔로잉 : ${followingsCount}명  팔로워 : ${followersCount}명`
+        })
+    })
+
+
+  </script>

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Movies</h1>
+
+  <a href="{% url 'movies:recommended' %}" class="btn btn-primary btn-lg mb-2" tabindex="-1" role="button">{{ user }}님을 위한 맞춤 영화 추천</a>
+  
+  <div class="row">
+  {% for movie in movies %}
+    <div class="col-3 card mb-3 mx-1">
+    <img src="{{ movie.poster_path }}" class="card-img-top" alt="...">
+    <div class="card-body">
+      <h5 class="card-title">{{ movie.title }}</h5>
+      {% if movie.overview %}
+        <p class="card-text">{{ movie.overview|truncatechars:60 }}</p>
+      {% else %}
+        <p>There's no content</p>
+      {% endif %}
+      {% for genre in movie.genres.all %}
+        <p class="card-text"><small class="text-muted">{{ genre.name }}</small></p>
+      {% endfor %}
+      <a href="{% url 'movies:detail' movie.pk %}" class="btn btn-primary">Detail</a>
+    </div>
+  </div>
+  {% endfor %}
+  </div>
+
+  
+{% endblock %}

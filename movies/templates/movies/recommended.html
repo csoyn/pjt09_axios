@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>{{ user }}님을 위한 영화 추천</h1>
+  
+  <div class="row">
+  {% for movie in popular_movies %}
+    <div class="col-3 card mb-3">
+    <img src="{{ movie.poster_path }}" class="card-img-top" alt="...">
+    <div class="card-body">
+      <h5 class="card-title">{{ movie.title }}</h5>
+      {% if movie.overview %}
+        <p class="card-text">{{ movie.overview|truncatechars:60 }}</p>
+      {% else %}
+        <p>There's no content</p>
+      {% endif %}
+      {% for genre in movie.genres.all %}
+        <p class="card-text"><small class="text-muted">{{ genre.name }}</small></p>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+  </div>
+
+{% endblock %}
